@@ -60,8 +60,8 @@ class data_loader(Dataset):
         # session_dataset.append(session)
         self.session_dataset += split(session)
 
-        self.emoList = sorted(emoSet) # 항상 같은 레이블 순서를 유지하기 위해
-        # self.emoList = ['anger', 'disgust', 'fear',' joy', 'neutral', 'sadness', 'surprise']
+        # self.emoList = sorted(emoSet) # 항상 같은 레이블 순서를 유지하기 위해
+        self.emoList = ['anger', 'disgust', 'fear',' joy', 'neutral', 'sadness', 'surprise']
         f.close()
     
     def __len__(self): # Dataset 기본적인 구성
