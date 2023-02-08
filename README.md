@@ -8,7 +8,13 @@
 ## 1. CoMPM 논문 소개
 - CoM(context module) : 입력으로는 대화의 발화들이 전부 들어간다.
 - PM(pre-trained memory module) : CSK와 같이 context-independent발화의 feature을 담아내기 위함이다. 
-
+![](img/ComPM.png)
+- 각 발화의 feature는 CLS vector로 추출한다. 
+- 이 vector를 GRU를 이용하여 하나의 vector로 만든다.
+- Attention-based 결합은 성능이 떨어진다.
+- speaker tracking만 한다.
+- Listener tracking는 큰 효과가 없다.
+- CoM과 PM의 feature vector의 dimension이 다르면 Wp을 이용하여 맞춰준다.
 
 
 ---
