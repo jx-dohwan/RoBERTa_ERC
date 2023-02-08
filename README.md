@@ -2,16 +2,14 @@
 ## 💡프로젝트 소개
 
 ```
-1️⃣ 주제 : KoBAR 한국어 대화문 생성요약 서비스
-2️⃣ 목표 : KoBART로 학습한 한국어 대화문 요약 모델을 Flask를 통해서 웹 서비스로 배포
-3️⃣ 설명 : 기존의 Aiffel에서 진행한 대화문 생성요약 프로젝트를 베이스로 하여 KoBART 모델을 개선 및 서빙을 진행할 것 
+1️⃣ 주제 : 대화속 감정인식
+2️⃣ 설명 : [CoMPM 논문](https://arxiv.org/pdf/2108.11626v3.pdf)을 기반으로 ERC 모델을 구 
 ```
+## 1. CoMPM 논문 소개
+- CoM(context module) : 입력으로는 대화의 발화들이 전부 들어간다.
+- PM(pre-trained memory module) : CSK와 같이 context-independent발화의 feature을 담아내기 위함이다. 
 
-<img src="img/result_v1.png"/>
 
-### 해당 프로젝트에 관한 자세한 설명은 블로그에 정리해 놓았다.<br>
-- [KoBART를 할용한 카카오톡 대화 요약 서비스_1(feat.개요와 데이터)](https://velog.io/@jx7789/%EC%B9%B4%EC%B9%B4%EC%98%A4%ED%86%A1-%EB%8C%80%ED%99%94-%EC%9A%94%EC%95%BD-%EC%84%9C%EB%B9%84%EC%8A%A4-pepkrzfe)<br>
-- [KoBART를 할용한 카카오톡 대화 요약 서비스_2(feat.모델과 평가)](https://velog.io/@jx7789/KoBART%EB%A5%BC-%ED%95%A0%EC%9A%A9%ED%95%9C-%EC%B9%B4%EC%B9%B4%EC%98%A4%ED%86%A1-%EB%8C%80%ED%99%94-%EC%9A%94%EC%95%BD-%EC%84%9C%EB%B9%84%EC%8A%A42feat.%EB%AA%A8%EB%8D%B8%EA%B3%BC-%ED%8F%89%EA%B0%80)
 
 ---
 ## 1. Model Test
