@@ -93,7 +93,7 @@ scheduler = get_linear_schedule_with_warmup(optimizer, num_warmup_steps=num_warm
 
 logger.info("############학습 시작############")
 best_dev_fscore = 0
-save_path = '.'
+save_path = '/content/drive/MyDrive/인공지능/대화속감정인식'
 for epoch in tqdm(range(training_epochs)):
     erc_model.train() 
     for i_batch, data in enumerate(tqdm(train_dataloader)):
