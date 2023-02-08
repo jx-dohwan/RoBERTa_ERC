@@ -1,6 +1,7 @@
 from transformers import RobertaModel
 import torch
 import torch.nn as nn
+import pdb
 
 class ERC_model(nn.Module):
     def __init__(self, clsNum):
@@ -11,7 +12,7 @@ class ERC_model(nn.Module):
         """ GRU 세팅 """
         self.hiddenDim = self.com_model.config.hidden_size
         zero = torch.empty(2, 1, self.hiddenDim)
-        self.h0 = torch.zeros_like(zero) # (num_layers * num_directions, batch, hidden_size)
+        self.h0 = torch.zeros_like(zero).cuda() # (num_layers * num_directions, batch, hidden_size)
         self.speakerGRU = nn.GRU(self.hiddenDim, self.hiddenDim, 2, dropout=0.3) # (input, hidden, num_layer) (BERT_emb, BERT_emb, num_layer)
         
         """ score matrix """
@@ -34,10 +35,11 @@ class ERC_model(nn.Module):
                 pm_gru_final = pm_gru_outs[-1,:,:] # (1, hidden_dim)
                 batch_pm_gru_final.append(pm_gru_final)
             else:
-                batch_pm_gru_final.append(torch.zeros(1, self.hiddenDim))
+                batch_pm_gru_final.append(torch.zeros(1, self.hiddenDim).cuda())
         batch_pm_gru_final = torch.cat(batch_pm_gru_final, 0)        
         
         """ score matrix """
+        #pdb.set_trace()
         final_output = self.W(batch_com_final + batch_pm_gru_final) # (B, C)
         
         return final_output
