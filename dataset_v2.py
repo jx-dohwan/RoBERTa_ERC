@@ -79,7 +79,8 @@ class data_loader(Dataset):
                      input_str +=  " " + self.special_words[1] + session[i] + self.tokenizer.sep_token
                 
                 if i != 0:
-                    PM_input.append(self.tokenizer.encode(session[i], add_special_tokens=True, return_tensors='pt'))
+                    # 여기에서 스페셜 토큰으로 발화자를 구분해줘야할까? 일단 논문소개에서 해줬다고해서 했다. 발화자의 정보를 담고 있으면 더 잘 학습 될 것이다.
+                    PM_input.append(self.tokenizer.encode(self.special_words[0] + session[i] if i % 2 == 0 else self.special_words[1] + session[i], add_special_tokens=True, return_tensors='pt')) 
 
             batch_input.append(input_str)
             batch_labels.append(self.emoList.index(session[-1]))
