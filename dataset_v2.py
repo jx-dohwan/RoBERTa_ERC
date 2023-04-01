@@ -32,7 +32,7 @@ class data_loader(Dataset):
           values.append(data[i]['profile']['emotion']['type'])
           self.session_dataset.append(values)
 
-        self.special_words = ["#hh#", "#hs#"]
+        self.special_words = ["#hh#", "#hs#"] # 발화자, 시스템
         self.tokenizer.add_special_tokens({"additional_special_tokens": self.special_words}) # 나중에 모델부분에서 스폐셜 토큰 갯수를 더 추가해서 resize를 해야함함
 
         self.emoList = ['분노', '슬픔', '불안', '상처', '당황', '기쁨']
@@ -73,14 +73,14 @@ class data_loader(Dataset):
             PM_input = []
 
             for i in range(len(session[:-1])):
-                if i % 2 == 0:
+                if i % 2 == 0: # [발화자, 시스템, 발화자, 시스템] 이런 형식으로 구성되어 있어 짝수:발화자, 홀수:시스템이 된다. 
                       input_str += " " + self.special_words[0] + session[i] + self.tokenizer.sep_token
                 else:
                      input_str +=  " " + self.special_words[1] + session[i] + self.tokenizer.sep_token
                 
-                if i != 0:
+                if i != 0 and i % 2 == 0:
                     # 여기에서 스페셜 토큰으로 발화자를 구분해줘야할까? 일단 논문소개에서 해줬다고해서 했다. 발화자의 정보를 담고 있으면 더 잘 학습 될 것이다.
-                    PM_input.append(self.tokenizer.encode(self.special_words[0] + session[i] if i % 2 == 0 else self.special_words[1] + session[i], add_special_tokens=True, return_tensors='pt')) 
+                    PM_input.append(self.tokenizer.encode(self.special_words[0] + session[i], add_special_tokens=True, return_tensors='pt')) 
 
             batch_input.append(input_str)
             batch_labels.append(self.emoList.index(session[-1]))
