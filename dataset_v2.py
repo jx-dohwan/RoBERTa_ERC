@@ -6,8 +6,8 @@ import torch
 class data_loader(Dataset):
     def __init__(self,data_path):
         self.tokenizer = AutoTokenizer.from_pretrained('klue/roberta-base')
-
-        with open(train_path) as f:
+        
+        with open(data_path) as f:
           data = json.load(f)
 
         self.session_dataset  = []
