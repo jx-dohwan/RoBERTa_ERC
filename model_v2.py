@@ -17,7 +17,7 @@ class ERC_model(nn.Module):
         """GRU"""
         self.hiddenDim = self.com_model.config.hidden_size
         zero = torch.empty(2, 1, self.hiddenDim)
-        self.h0 = torch.zeros_like(zero)
+        self.h0 = torch.zeros_like(zero).cuda() # 레이어들은 gpu로 작동하나 이런형식으로 값을 지정하는 것은 cuda()를 따로 지정해줘야한다.
         self.speakerGRU = nn.GRU(self.hiddenDim, self.hiddenDim, 2, dropout=0.3)
 
         """score matrix"""
@@ -41,7 +41,7 @@ class ERC_model(nn.Module):
                 pm_gru_first = pm_gru_outs[0,:,:] # (1, hidden_dim) 첫번째것이이 중요하니 해당하는 것을 가져와서 사용함
                 batch_pm_gru_first.append(pm_gru_first)
             else:
-                batch_pm_gru_first.append(torch.zeros(1, hiddenDim)) #pm입력이 없는 경우 torch zero를 넣어준다.
+                batch_pm_gru_first.append(torch.zeros(1, hiddenDim).cuda()) #pm입력이 없는 경우 torch zero를 넣어준다.
         batch_pm_gru_first = torch.cat(batch_pm_gru_first, 0)
 
         """score matrix"""
