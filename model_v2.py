@@ -37,11 +37,11 @@ class ERC_model(nn.Module):
                     pm_out = self.pm_model(PM_input)['last_hidden_state'][:,0,:] # CLS의 출력/attention에 해당하는 것을 명시하지 않고 토큰들만 넣어 pm 출력 뽑아냄 그중 CLS
                     pm_outs.append(pm_out)
                 pm_outs = torch.cat(pm_outs, 0).unsqueeze(1) # (speaker_num, batch=1, hidden_dim)로 만듬 토치텐서
-                pm_gru_outs, _ = self.speakerGRU(pm_outs, h0) # (speaker_num, batch=1, hidden_dim)로 만듬 토치텐서서 pm_outs의 hs 계산하기전 h0로 초기화하는 것/ 그리고 model의 hs와 현재 발화자의 값을 가져와 hs를 업데이트 하는 것이다.
+                pm_gru_outs, _ = self.speakerGRU(pm_outs, self.h0) # (speaker_num, batch=1, hidden_dim)로 만듬 토치텐서서 pm_outs의 hs 계산하기전 h0로 초기화하는 것/ 그리고 model의 hs와 현재 발화자의 값을 가져와 hs를 업데이트 하는 것이다.
                 pm_gru_first = pm_gru_outs[0,:,:] # (1, hidden_dim) 첫번째것이이 중요하니 해당하는 것을 가져와서 사용함
                 batch_pm_gru_first.append(pm_gru_first)
             else:
-                batch_pm_gru_first.append(torch.zeros(1, hiddenDim).cuda()) #pm입력이 없는 경우 torch zero를 넣어준다.
+                batch_pm_gru_first.append(torch.zeros(1, self.hiddenDim).cuda()) #pm입력이 없는 경우 torch zero를 넣어준다.
         batch_pm_gru_first = torch.cat(batch_pm_gru_first, 0)
 
         """score matrix"""
