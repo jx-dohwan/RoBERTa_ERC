@@ -84,7 +84,7 @@ def CalACC(model, dataloader):
             batch_label = batch_label.cuda()        
 
             """Prediction"""
-            pred_logits = erc_model(batch_padding_token, batch_padding_attention_mask, batch_PM_input)
+            pred_logits = model(batch_padding_token, batch_padding_attention_mask, batch_PM_input)
             
             """Calculation"""    
             pred_label = pred_logits.argmax(1).item()
