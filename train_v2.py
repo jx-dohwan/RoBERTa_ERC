@@ -190,7 +190,7 @@ def main(config):
         
         logger.info("Dev W-avg F1: {}".format(dev_fbeta))
         
-        test_acc, test_pred_list, test_label_list = CalACC(erc_model, test_dataloader)
+        # test_acc, test_pred_list, test_label_list = CalACC(erc_model, test_dataloader)
         """Best Score & Model Save"""
         if dev_fbeta > best_dev_fscore:
             best_dev_fscore = dev_fbeta
