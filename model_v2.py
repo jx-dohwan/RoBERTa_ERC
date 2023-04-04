@@ -47,4 +47,4 @@ class ERC_model(nn.Module):
         """score matrix"""
         first_output = self.W(batch_com_first + batch_pm_gru_first)
 
-        return first_output
+        return first_output, self.com_model.config.vocab_size
