@@ -1,5 +1,5 @@
 import torch
-from transformers import get_linear_schedule_with_warmup, AutoTokenizer
+from transformers import get_linear_schedule_with_warmup, AutoTokenizer, AutoConfig
 from tqdm import tqdm
 import argparse
 import pdb
@@ -10,9 +10,10 @@ sys.path.append('/content/drive/MyDrive/인공지능/대
 from dataset_v2 import data_loader
 from model_v2 import ERC_model
 from torch.utils.data import DataLoader
-
+from sklearn.metrics import precision_recall_fscore_support
 import logging
-
+import json
+import pandas as pd
 # 로그 생성
 logger = logging.getLogger()
 
@@ -36,8 +37,10 @@ def define_argparser():
     p.add_argument('--save_fn', required=True)
     
     p.add_argument('--epochs', type=int, default=5)
+    p.add_argument('--training_steps', type=int, required=False)
+    p.add_argument('--warmup_steps', type=int, required=False)
     p.add_argument('--grad_norm', type=int, default=10)
-    p.add_argument('--batch_size', type=int, default=1)
+    p.add_argument('--batch_size', type=int, default=1) # batch_size는 1로해야지 돌아감 
     p.add_argument('--num_workers', type=int, default=4)
     p.add_argument('--lr', type=float, default=1e-6)    
 
@@ -54,18 +57,36 @@ def CELoss(pred_outs, labels):
     loss_val = loss(pred_outs, labels)
     return loss_val
 
-def SaveModel(model, path, tokenizer, config, optimizer, scheduler):
+# https://tutorials.pytorch.kr/beginner/saving_loading_models.html
+def SaveModel(model, path, tokenizer, config, optimizer, scheduler, epoch, loss, test_fbeta):
+    path = os.path.join(path, "checkpoint-{}".format(epoch+1))
     if not os.path.exists(path):
         os.makedirs(path)
-
-    model.save_pretrained(path)
+    
     tokenizer.save_pretrained(path)
-    torch.save(config, model.state_dict(), os.path.join(path, 'model.bin'))    
-    logger.info("Saving model checkpoint to %s", path)
+    config.save_pretrained(path)
 
-    torch.save(optimizer.state_dict(), os.path.join(path, "optimizer.pt"))
-    torch.save(scheduler.state_dict(), os.path.join(path, "scheduler.pt"))
-    logger.info("Saving optimizer and scheduler states to %s", path)
+    # torch.save(model.state_dict(), os.path.join(path, "ERC_model.bin"))
+    # logger.info("Saving model checkpoint to %s", path)
+
+    # torch.save(optimizer.state_dict(), os.path.join(path, "optimizer.pt"))
+    # torch.save(scheduler.state_dict(), os.path.join(path, "scheduler.pt"))
+    
+    # config_dict = config.to_dict()
+    # with open(path+"/config.json", "w", encoding='utf-8') as f:
+    #     json.dump(config_dict, f)
+    # logger.info("Saving optimizer and scheduler states to %s", path)
+    df = pd.DataFrame({"Test W-avg F1" : [test_fbeta]})
+    df.to_csv(os.path.join(path, "F1_W_avg.csv"), mode='w', index = False)
+    torch.save({
+        'epoch' : epoch,
+        'ERC_model' : model.state_dict(),
+        'scheduler' : scheduler.state_dict(),
+        'config' : config,
+        'optimizer' : optimizer.state_dict(),
+        'loss' : loss
+    },  os.path.join(path, 'ERC_model.bin'))
+
 
 def CalACC(model, dataloader):
     model.eval()
@@ -84,7 +105,7 @@ def CalACC(model, dataloader):
             batch_label = batch_label.cuda()        
 
             """Prediction"""
-            pred_logits = model(batch_padding_token, batch_padding_attention_mask, batch_PM_input)
+            pred_logits, none_data = model(batch_padding_token, batch_padding_attention_mask, batch_PM_input)
             
             """Calculation"""    
             pred_label = pred_logits.argmax(1).item()
@@ -95,7 +116,16 @@ def CalACC(model, dataloader):
             if pred_label == true_label:
                 correct += 1
         acc = correct/len(dataloader)
-    return acc, pred_list, label_list
+    return acc, pred_list, label_list    
+
+def config_json_file(config, vocab_size):
+  
+    config_json = AutoConfig.from_pretrained('klue/roberta-base')
+    config_json.layer_norm_eps = config.lr
+    config_json.vocab_size = vocab_size
+    config_json.grad_norm = config.grad_norm
+
+    return config_json
 
 def main(config):
 
@@ -111,9 +141,20 @@ def main(config):
 
     clsNum = len(train_dataset.emoList)
     erc_model = ERC_model(clsNum).cuda()
-
-    num_training_steps = len(train_dataset)*config.epochs
-    num_warmup_steps = len(train_dataset)
+  
+    if config.training_steps is not None and config.warmup_steps is not None:
+        num_training_steps = config.training_steps
+        num_warmup_steps = config.warmup_steps
+    elif config.training_steps is not None and config.warmup_steps is None:
+        num_training_steps = config.training_steps
+        num_warmup_steps = len(train_dataset)
+    elif config.training_steps is None and config.warmup_steps is not None:
+        num_training_steps = len(train_dataset) * config.epochs
+        num_warmup_steps = config.warmup_steps
+    else:
+        num_training_steps = len(train_dataset) * config.epochs
+        num_warmup_steps = len(train_dataset)
+    
     optimizer = torch.optim.AdamW(erc_model.parameters(), lr=config.lr) # , eps=1e-06, weight_decay=0.01
     scheduler = get_linear_schedule_with_warmup(optimizer, num_warmup_steps=num_warmup_steps, num_training_steps=num_training_steps)
 
@@ -129,7 +170,7 @@ def main(config):
             batch_label = batch_label.cuda()        
 
             """Prediction"""
-            pred_logits = erc_model(batch_padding_token, batch_padding_attention_mask, batch_PM_input)
+            pred_logits, vocab_size = erc_model(batch_padding_token, batch_padding_attention_mask, batch_PM_input)
 
             """Loss calculation & training"""
             loss_val = CELoss(pred_logits, batch_label)
@@ -157,7 +198,9 @@ def main(config):
             test_acc, test_pred_list, test_label_list = CalACC(erc_model, test_dataloader)
             test_pre, test_rec, test_fbeta, _ = precision_recall_fscore_support(test_label_list, test_pred_list, average='weighted')                
 
-            SaveModel(erc_model, config.save_path, tokenizer, config, optimizer, scheduler)
+            config_json = config_json_file(config, vocab_size)
+
+            SaveModel(erc_model, config.save_fn, tokenizer, config_json, optimizer, scheduler, epoch, loss_val, test_fbeta)
             logger.info("Epoch:{}, Test W-avg F1: {}".format(epoch, test_fbeta))
 
 
