@@ -27,7 +27,7 @@
 !pip install transformers==4.25.1
 !pip install sklearn
 
-!python3 train.py
+!python train.py
 ```
 
 ### 2. Test
@@ -50,13 +50,50 @@ print('')
 
 ---
 ## 모델_v2
+### 1. args
+```
+# 필수지정
+p.add_argument('--train_fn', required=True)
+p.add_argument('--dev_fn', required=True)
+p.add_argument('--test_fn', required=True)
+p.add_argument('--save_fn', required=True)
 
-### 1. train
+# 기타지정
+p.add_argument('--epochs', type=int, default=5)
+p.add_argument('--training_steps', type=int, required=False)
+p.add_argument('--warmup_steps', type=int, required=False)
+p.add_argument('--grad_norm', type=int, default=10)
+p.add_argument('--num_workers', type=int, default=4)
+p.add_argument('--lr', type=float, default=1e-6)  
+```
+
+### 2. train
 
 ```
+!pip install transformers==4.25.1
+!pip install sklearn
+
+!python train_v2.py --train_fn 'data/train.json' --dev_fn 'data/valid.json' --test_fn 'data/valid.json' --save_fn 'checkpoint'
 ```
-### 2. test
+### 3. test
 ```
+from error_sample import ErrorSamples 
+
+data_path = "valid.json"
+model_path = "checkpoint/checkpoint-4/ERC_model.bin"
+
+error_samples, acc, pred_list, label_list, test_dataset = ErrorSamples(data_path, model_path)
+
+# error sample 확인
+import random
+random_error_samples = random.sample(error_samples, 10)
+     
+for random_error_sample in random_error_samples:
+    batch_padding_token, true_label, pred_label = random_error_sample
+    print('--------------------------------------------------------')
+    print("입력 문장들: ", test_dataset.tokenizer.decode(batch_padding_token.squeeze(0).tolist()))
+    print("정답 감정: ", test_dataset.emoList[true_label])
+    print("예측 감정: ", test_dataset.emoList[pred_label])
 ```
 
 
