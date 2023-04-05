@@ -83,7 +83,9 @@ data_path = "valid.json"
 model_path = "checkpoint/checkpoint-4/ERC_model.bin"
 
 error_samples, acc, pred_list, label_list, test_dataset = ErrorSamples(data_path, model_path)
-
+```
+#### 1) local test
+```
 # error sample 확인
 import random
 random_error_samples = random.sample(error_samples, 10)
@@ -95,7 +97,34 @@ for random_error_sample in random_error_samples:
     print("정답 감정: ", test_dataset.emoList[true_label])
     print("예측 감정: ", test_dataset.emoList[pred_label])
 ```
+#### 2) global test
+```
+true_emotion = []
+pred_emotion = []
+for error_sample in error_samples:
+    batch_padding_token, true_label, pred_label = error_sample
+    input_sentence = test_dataset.tokenizer.decode(batch_padding_token.squeeze(0).tolist())
+    true_emotion.append(test_dataset.emoList[true_label])
+    pred_emotion.append(test_dataset.emoList[pred_label])
+    
+    
+from collections import Counter
 
+data = Counter(true_emotion) # 여기에 true_emotion을 넣을지 pred_emotion을 넣을지 결정함녀 된다.
+emotions = list(data.keys())
+counts = list(data.values())
+
+# 막대 그래프 그리기
+fig, ax = plt.subplots()
+ax.bar(emotions, counts) # x축에는 감정 카테고리, y축에는 빈도수를 나타내는 막대 그래프 그리기
+
+ax.set_xlabel('감정')
+ax.set_ylabel('빈도')
+ax.set_title('감정의 분포')
+
+plt.show()
+    
+```
 
 ---
 ## 🗓️ 프로젝트 개선 진행
