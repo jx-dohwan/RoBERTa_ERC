@@ -5,6 +5,13 @@
 #### 2️⃣ 설명 : [CoMPM 논문](https://arxiv.org/pdf/2108.11626v3.pdf)을 기반으로 ERC 모델을 구현<br> 
 #### 3️⃣ 모델 : Hugging Face [roberta-base](https://huggingface.co/roberta-base) 모델 사용하여 진행<br><br>
 
+### 해당 프로젝트에 관한 자세한 사항은 블로그에 정리해 놓았다.
+- [RoBERTa를 활용한 대화 속 감정 인식_1(feat.논문, 베이스라인)]https://velog.io/@jx7789/RoBERTa%EB%A5%BC-%ED%99%9C%EC%9A%A9%ED%95%9C-%EB%8C%80%ED%99%94-%EC%86%8D-%EA%B0%90%EC%A0%95%EC%9D%B8%EC%8B%9D1feat.%EB%85%BC%EB%AC%B8-%EB%AA%A8%EB%8D%B8%EC%86%8C%EA%B0%9C-%ED%8E%B8)
+- [RoBERTa를 활용한 대화 속 감정 인식_2(feat.데이터)](https://velog.io/@jx7789/RoBERTa%EB%A5%BC-%ED%99%9C%EC%9A%A9%ED%95%9C-%EB%8C%80%ED%99%94-%EC%86%8D-%EA%B0%90%EC%A0%95-%EC%9D%B8%EC%8B%9D2feat.%EB%8D%B0%EC%9D%B4%ED%84%B0)
+- [RoBERTa를 활용한 대화 속 감정 인식_3(ft.모델편)]https://velog.io/@jx7789/RoBERTa%EB%A5%BC-%ED%99%9C%EC%9A%A9%ED%95%9C-%EB%8C%80%ED%99%94-%EC%86%8D-%EA%B0%90%EC%A0%95-%EC%9D%B8%EC%8B%9D3ft.%EB%AA%A8%EB%8D%B8%ED%8E%B8)
+- [RoBERTa를 활용한 대화 속 감정 인식_4(feat.학습편)](https://velog.io/@jx7789/RoBERTa%EB%A5%BC-%ED%99%9C%EC%9A%A9%ED%95%9C-%EB%8C%80%ED%99%94-%EC%86%8D-%EA%B0%90%EC%A0%95-%EC%9D%B8%EC%8B%9D4feat.%ED%95%99%EC%8A%B5%ED%8E%B8)
+- [RoBERTa를 활용한 대화 속 감정 인식_5(feat.평가편)](https://velog.io/@jx7789/RoBERTa%EB%A5%BC-%ED%99%9C%EC%9A%A9%ED%95%9C-%EB%8C%80%ED%99%94-%EC%86%8D-%EA%B0%90%EC%A0%95-%EC%9D%B8%EC%8B%9D5feat.%ED%8F%89%EA%B0%80%ED%8E%B8)
+
 ## CoMPM 논문 소개
 #### CoM(context module) : 입력으로는 대화의 발화들이 전부 들어간다.
 #### PM(pre-trained memory module) : CSK와 같이 context-independent발화의 feature을 담아내기 위함이다. <br><br>
