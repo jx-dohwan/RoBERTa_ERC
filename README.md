@@ -122,8 +122,7 @@ ax.set_xlabel('감정')
 ax.set_ylabel('빈도')
 ax.set_title('감정의 분포')
 
-plt.show()
-    
+plt.show()    
 ```
 
 ---
